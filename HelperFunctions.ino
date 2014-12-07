@@ -4,11 +4,18 @@ Helpfull functions to keep the actual animation code short.
  
  XY()
  FillNoise(byte layer)
- InitCoordinates()
- ShowFrame()
- Line(int x0, int y0, int x1, int y1, byte color)
+ BasicVariablesSetup
+ ShowFrame
  DimAll(byte value)
- CLS()
+ CLS
+ MergeMethod1(byte colorrepeat)
+ MergeMethod2(byte colorrepeat)
+ MergeMethod3(byte colorrepeat)
+ MergeMethod4(byte colorrepeat)
+ ConstrainedMapping(byte layer, byte lower_limit, byte upper_limit, byte colorrepeat)
+ ShowAll(uint16_t frames_per_animation)
+ ColorCorrection
+ 
  -----------------------------------------------------------------
  */
 
@@ -16,8 +23,8 @@ Helpfull functions to keep the actual animation code short.
 // Translate the x/y coordinates into the right index in the
 // framebuffer.
 // The Smartmatrix has a simple line by line layout, no 
-// serpentines. It safes 2 fps to keep this function short.
-// The function is called over 200 000 times per second!
+// serpentines. It safed 2 fps to keep this function short.
+// The function is called (sometimes) over 200 000 times per second!
 
 uint16_t XY( uint8_t x, uint8_t y) {
   uint16_t i;
@@ -58,11 +65,19 @@ void FillNoise(byte layer) {
 // values for an altering starting point.
 // Set the zoom factor to a moderate level.
 
-void InitCoordinates() {
+void BasicVariablesSetup() {
+
+  // set to reasonable values to avoid a black out
+  colorshift = 0;
+  noisesmoothing = 200;
+  
+  currentPalette = RainbowColors_p;
 
   // just any free input pin
   random16_add_entropy(analogRead(18));
 
+  // fill coordinates with random values
+  // set zoom levels
   for(int i = 0; i < NUM_LAYERS; i++) {
     x[i] = random16();
     y[i] = random16();
@@ -70,6 +85,13 @@ void InitCoordinates() {
     scale_x[i] = 6000;
     scale_y[i] = 6000;
   }
+  // everything for the menu
+  mode = 0;
+  spd = 127;
+  brightness = 255;
+  red_level = 255;
+  green_level = 255;
+  blue_level = 255;
 }
 
 
@@ -83,43 +105,10 @@ void ShowFrame() {
 
   // count and output the fps
   LEDS.countFPS();
-  Serial.print("FPS: ");
-  Serial.println(LEDS.getFPS());
 
-  /*
-  ShowParameters(0);
-   ShowParameters(1);
-   ShowParameters(2);
-   */
-  SerialWriteNoiseValue(0);
-  SerialWriteNoiseValue(1);
-  SerialWriteNoiseValue(2);
+  // output debugging infos
+  ShowMenuValues();
 }
-
-
-/*
-// Bresenham line algorythm draws a colored line
- // between 2 given points
- 
- void Line(int x0, int y0, int x1, int y1, byte color) {
- int dx =  abs(x1-x0), sx = x0 < x1 ? 1 : -1;
- int dy = -abs(y1-y0), sy = y0 < y1 ? 1 : -1;
- int err = dx + dy, e2; 
- for(;;) {  
- leds[XY(x0, y0)] = CHSV(color, 255, 255);
- if (x0 == x1 && y0 == y1) break;
- e2 = 2 * err;
- if (e2 > dy) { 
- err += dy; 
- x0 += sx; 
- } 
- if (e2 < dx) { 
- err += dx; 
- y0 += sy; 
- } 
- }
- }
- */
 
 
 // Dim everything in leds a bit down.
@@ -141,64 +130,49 @@ void CLS()
   }
 }
 
-//probably useless
-void CorrectBrightness() {
-  for(uint8_t i = 0; i < kMatrixWidth; i++) {
-    for(uint8_t j = 0; j < kMatrixHeight; j++) {
-
-      uint16_t  bri = (noise[2][i][j]);
-
-      bri = bri - 15000;
-
-      bri = bri * 1.3;
-
-
-    }
-  }
-
-}
 
 // overlay layers 0&1&2 for color, layer 2 is brightness
+
 void MergeMethod1(byte colorrepeat) { 
   for(uint8_t i = 0; i < kMatrixWidth; i++) {
     for(uint8_t j = 0; j < kMatrixHeight; j++) {
 
       // map the noise values down to a byte range
       // layer 0 and 2 interfere for the color
-      uint8_t color = ( (noise[0][i][j] )
-        +(noise[1][i][j])
-        +(noise[2][i][j]))
-        /3
-          ; 
+      uint8_t color = ( ( noise[0][i][j] )
+        + ( noise[1][i][j] )
+        + ( noise[2][i][j] ) )
+        / 3; 
 
-      // layer 1 gives the brightness  
+      // layer 2 gives the brightness  
       uint8_t   bri = (noise[2][i][j]);
-      //uint8_t   bri = 255;
+
       // assign a color depending on the actual palette
-      CRGB pixel = ColorFromPalette( currentPalette, colorrepeat * (color+colorshift), bri );
+      CRGB pixel = ColorFromPalette( currentPalette, colorrepeat * (color + colorshift), bri );
 
       leds[XY(i,j)] = pixel;
     }
   }
 } 
 
+
 // overlay layers 0&1 for color, layer 2 is brightness
+
 void MergeMethod2(byte colorrepeat) { 
   for(uint8_t i = 0; i < kMatrixWidth; i++) {
     for(uint8_t j = 0; j < kMatrixHeight; j++) {
 
       // map the noise values down to a byte range
       // layer 0 and 2 interfere for the color
-      uint8_t color = ( (noise[0][i][j] )
-        +(noise[1][i][j]))
-        /2
-          ; 
+      uint8_t color = ( ( noise[0][i][j] )
+        + ( noise[1][i][j] ) )
+        / 2; 
 
-      // layer 1 gives the brightness  
+      // layer 2 gives the brightness  
       uint8_t   bri = (noise[2][i][j]);
-      //uint8_t   bri = 255;
+
       // assign a color depending on the actual palette
-      CRGB pixel = ColorFromPalette( currentPalette, colorrepeat * (color+colorshift), bri );
+      CRGB pixel = ColorFromPalette( currentPalette, colorrepeat * (color + colorshift), bri );
 
       leds[XY(i,j)] = pixel;
     }
@@ -207,22 +181,22 @@ void MergeMethod2(byte colorrepeat) {
 
 
 // overlay layers 0&1 for color, brightness is layer1
+
 void MergeMethod3(byte colorrepeat) { 
   for(uint8_t i = 0; i < kMatrixWidth; i++) {
     for(uint8_t j = 0; j < kMatrixHeight; j++) {
 
       // map the noise values down to a byte range
       // layer 0 and 2 interfere for the color
-      uint8_t color = ( (noise[0][i][j] )
-        +(noise[1][i][j]))
-        /2
-          ; 
+      uint8_t color = ( ( noise[0][i][j] )
+        + ( noise[1][i][j] ) )
+        / 2; 
 
       // layer 1 gives the brightness  
       uint8_t   bri = noise[1][i][j];
-      //uint8_t   bri = 255;
+
       // assign a color depending on the actual palette
-      CRGB pixel = ColorFromPalette( currentPalette, colorrepeat * (color+colorshift), bri );
+      CRGB pixel = ColorFromPalette( currentPalette, colorrepeat * (color + colorshift), bri );
 
       leds[XY(i,j)] = pixel;
     }
@@ -230,8 +204,33 @@ void MergeMethod3(byte colorrepeat) {
 }
 
 
+// overlay layers 0&1&2 for color, layer 0 is brightness
+
+void MergeMethod4(byte colorrepeat) { 
+  for(uint8_t i = 0; i < kMatrixWidth; i++) {
+    for(uint8_t j = 0; j < kMatrixHeight; j++) {
+
+      // map the noise values down to a byte range
+      // layer 0 and 2 interfere for the color
+      uint8_t color = ( ( noise[0][i][j] )
+        + ( noise[1][i][j] )
+        + ( noise[2][i][j] ) )
+        / 3; 
+
+      // layer 2 gives the brightness  
+      uint8_t   bri = (noise[0][i][j]);
+
+      // assign a color depending on the actual palette
+      CRGB pixel = ColorFromPalette( currentPalette, colorrepeat * (color + colorshift), bri );
+
+      leds[XY(i,j)] = pixel;
+    }
+  }
+} 
+
 
 // draw the part between lower and upper limit of one layer
+
 void ConstrainedMapping(byte layer, byte lower_limit, byte upper_limit, byte colorrepeat) {
 
   for(uint8_t i = 0; i < kMatrixWidth; i++) {
@@ -241,7 +240,7 @@ void ConstrainedMapping(byte layer, byte lower_limit, byte upper_limit, byte col
 
       if ( data >= lower_limit  && data <= upper_limit) {
 
-        CRGB pixel = ColorFromPalette( currentPalette, colorrepeat*(data+colorshift), data );
+        CRGB pixel = ColorFromPalette( currentPalette, colorrepeat * (data + colorshift), data );
 
         leds[XY(i,j)] = pixel;
       }
@@ -250,13 +249,22 @@ void ConstrainedMapping(byte layer, byte lower_limit, byte upper_limit, byte col
 }
 
 
-
-
 void ShowAll(uint16_t count) {
+  for(uint16_t i = 0; i < count; i++) {
+    MirroredNoise();
+    ShowFrame();
+  }  
+
+  for(uint16_t i = 0; i < count; i++) {
+    RedClouds();
+    ShowFrame();
+  }
+
   for(uint16_t i = 0; i < count; i++) {
     Lavalamp1();
     ShowFrame();
-  }  
+  }
+
   for(uint16_t i = 0; i < count; i++) {
     Lavalamp2();
     ShowFrame();
@@ -277,10 +285,80 @@ void ShowAll(uint16_t count) {
     Lavalamp5();
     ShowFrame();
   }
-  
-    for(uint16_t i = 0; i < count; i++) {
+
+  for(uint16_t i = 0; i < count; i++) {
     Constrained1();
     ShowFrame();
   }
+
+  for(uint16_t i = 0; i < count; i++) {
+    RelativeMotion1();
+    ShowFrame();
+  }
+
+  for(uint16_t i = 0; i < count; i++) {
+    Water();
+    ShowFrame();
+  }
+
+  for(uint16_t i = 0; i < count; i++) {
+    Bubbles1();
+    ShowFrame();
+  }
+
+  for(uint16_t i = 0; i < count; i++) {
+    TripleMotion();
+    ShowFrame();
+  }
+  
+    for(uint16_t i = 0; i < count; i++) {
+    CrossNoise2();
+    ShowFrame();
+  }
+
+
 }
+
+void ColorCorrection() {
+  for(uint16_t i = 0; i < NUM_LEDS; i++) {
+    leds[i].r = scale8(leds[i].r, red_level);
+    leds[i].g = scale8(leds[i].g, green_level);
+    leds[i].b = scale8(leds[i].b, blue_level);
+  }
+}
+
+// a constrained noise the fills the holes with a mirrored and recolored version of the same noise
+void CrossMapping(byte colorrepeat, byte limit) { 
+  for(uint8_t i = 0; i < kMatrixWidth; i++) {
+    for(uint8_t j = 0; j < kMatrixHeight; j++) {
+
+      uint8_t color1 = noise[0][i][j];
+      uint8_t color2 = noise[0][j][i];
+      
+      CRGB pixel;
+
+      if (color1 > limit) {
+        pixel = ColorFromPalette( currentPalette, colorrepeat * (color1 + colorshift), color2 );
+      }
+      else {
+        pixel = ColorFromPalette( currentPalette, colorrepeat * (color2 + colorshift + 128), color1 );
+      }
+      leds[XY(i,j)] = pixel;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

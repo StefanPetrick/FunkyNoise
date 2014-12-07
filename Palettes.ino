@@ -1,11 +1,9 @@
 /*
 Some color palettes. 
-Includes the predifined FastLED palettes and custom ones.
-
-PaletteRed()
-Pal()
------------------------------------------------------------------
-*/
+ Includes the predifined FastLED palettes and custom ones.
+ 
+ -----------------------------------------------------------------
+ */
 
 
 // A red-black palette.
@@ -20,14 +18,13 @@ void PaletteRed() {
 
 void PaletteCustom() {
   currentPalette = CRGBPalette16( 
-  CHSV( 40, 255, 255 ), 
-  CHSV( 40, 255, 255   ), 
+  CHSV( 40, 255, 255), 
+  CHSV( 40, 255, 255), 
   CHSV( 0, 255, 0   ),
   CHSV( 0, 255, 255)); 
 }
 
-// Hopefully uses by any animation. Set here
-// a global color palette.
+// Set here a global color palette.
 // All the the predifined FastLED palettes:
 
 void Pal() {
@@ -42,5 +39,22 @@ void Pal() {
   //currentPalette = PartyColors_p;
   //currentPalette = HeatColors_p;
 }
-  
-  
+
+void SetupRandomPalette() {
+  currentPalette = CRGBPalette16( 
+  CHSV( random8(), 255, 32 ), 
+  CHSV( random8(), 255, 255), 
+  CHSV( random8(), 128, 255), 
+  CHSV( random8(), 255, 255)); 
+}
+
+
+void Palette16() {
+  currentPalette = CRGBPalette16(
+  0x000000, 0xFF0000, 0xFF0000, 0x000000,
+  0x000000, 0x00FF00, 0x00FF00, 0x000000,
+  0x000000, 0x0000FF, 0x0000FF, 0x000000,
+  0x000000, 0xFF0000, 0xFF0000, 0x000000); 
+}
+
+

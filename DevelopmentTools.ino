@@ -3,10 +3,7 @@ Some useful functions for developing and debugging.
  Contains some magic numbers and is written specificly
  for the SmartMatrix.
  
- Providing the following functions:
  
- ShowPalette
- Show3Layers
  -----------------------------------------------------------------
  */
 
@@ -22,26 +19,45 @@ void ShowPalette() {
 }
 
 
+// show just one layer
+
+void ShowLayer(byte layer, byte colorrepeat) { 
+  for(uint8_t i = 0; i < kMatrixWidth; i++) {
+    for(uint8_t j = 0; j < kMatrixHeight; j++) {
+
+      uint8_t color = noise[layer][i][j]; 
+
+      uint8_t   bri = color;
+
+      // assign a color depending on the actual palette
+      CRGB pixel = ColorFromPalette( currentPalette, colorrepeat * (color + colorshift), bri );
+
+      leds[XY(i,j)] = pixel;
+    }
+  }
+}
+
+
+
 // Show 3 small 16x16 versions of the 3 noise planes
 // to keep track what is going on where when.
 // Useful to check before you start merging layers.
 // Expects a 32x32 matrix to be the output device.
 
-
 void Show3Layers() {
   for(uint8_t i = 0; i < 16; i++) {
     for(uint8_t j = 0; j < 16; j++) {
-      leds[XY(i,j)] = ColorFromPalette( currentPalette, noise[0][i*2][j*2] , 255 );
+      leds[XY(i,j)] = ColorFromPalette( currentPalette, noise[0][i*2][j*2]*2 , 255 );
     }
   }
   for(uint8_t i = 16; i < 32; i++) {
     for(uint8_t j = 0; j < 16; j++) {
-      leds[XY(i,j)] = ColorFromPalette( currentPalette, noise[1][(i-16)*2][j*2] , 255 );
+      leds[XY(i,j)] = ColorFromPalette( currentPalette, noise[1][(i-16)*2][j*2]*2 , 255 );
     }
   }
   for(uint8_t i = 0; i < 16; i++) {
     for(uint8_t j = 16; j < 32; j++) {
-      leds[XY(i,j)] = ColorFromPalette( currentPalette, noise[2][i*2][(j-16)*2] , 255 );
+      leds[XY(i,j)] = ColorFromPalette( currentPalette, noise[2][i*2][(j-16)*2]*2 , 255 );
     }
   }
 }
@@ -63,7 +79,7 @@ void ShowParameters(byte layer) {
   Serial.print(" ");   
 }
 
-// output 8 bit of the noise value of noise[layer][0][0]
+// output the noise value of noise[layer][0][0]
 void SerialWriteNoiseValue(byte layer) {
   Serial.print("Layer");
   Serial.print(layer);
@@ -71,4 +87,67 @@ void SerialWriteNoiseValue(byte layer) {
   Serial.print(noise[layer][0][0]);
   Serial.print("  ");
 }
+
+
+void ShowMenuValues() {
+  // serial print all relevant data
+  Serial.print("Mode ");
+  Serial.print(mode);
+  Serial.print(" PGM ");
+  Serial.print(pgm);
+  Serial.print(" SPD ");
+  Serial.print(spd);
+  Serial.print(" BRI ");
+  Serial.print(brightness);
+  Serial.print(" RED ");
+  Serial.print(red_level);
+  Serial.print(" GRN ");
+  Serial.print(green_level);
+  Serial.print(" BLU ");
+  Serial.print(blue_level);
+  Serial.print(" FPS: ");
+  Serial.println(LEDS.getFPS());
+}
+
+// under construction!
+void ShowNumberDistribution() {
+  currentPalette = RainbowColors_p;
+  x[0] += 1000;
+  y[0] += 1000;
+  z[0] += 1000;
+  FillNoise(0);
+  CLS();
+  // clear array
+  for(uint16_t i = 0; i < 256; i++) {
+    values[i] = 0;
+  }
+  // count values
+  for(uint16_t i = 0; i < 32; i++) {
+    for(uint16_t j = 0; j < 32; j++) {
+      //if (noise[0][i][j] == 133) values[0]++;
+      //if (noise[0][i][j] == 129) values[1]++;
+      values[noise[0][i][j]]++;
+    }
+  }
+  // output a part of the result
+  for(uint16_t i = 150; i < 170; i++) {
+    Serial.print(" ");
+    Serial.print(values[i]);
+  }
+  // draw chart
+  for(uint8_t i = 100; i < 132; i++) {
+    for(uint8_t j = 0; j < values[i]; j++) {
+      leds[XY(i-100, 32-(j/4))] = 0xFF0000;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
 
