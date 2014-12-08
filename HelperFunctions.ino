@@ -46,7 +46,7 @@ void FillNoise(byte layer) {
       uint32_t joffset = scale_y[layer] * (j-CentreY);
 
       byte data = inoise16(x[layer] + ioffset, y[layer] + joffset, z[layer]) >> 8;
-
+/*
       // Marks data smoothing
       data = qsub8(data,16);
       data = qadd8(data,scale8(data,39));
@@ -54,6 +54,7 @@ void FillNoise(byte layer) {
       uint8_t olddata = noise[layer][i][j];
       uint8_t newdata = scale8( olddata, noisesmoothing ) + scale8( data, 256 - noisesmoothing );
       data = newdata;
+      */
 
       noise[layer][i][j] = data;
     }

@@ -459,7 +459,7 @@ void CrossNoise2() {
   scale_y[0] = beatsin16(2,1000,10000);
   FillNoise(0);
   
-  byte border = beatsin8(8, 20, 236);
+  byte border = beatsin8(8);
   
   CrossMapping(1, border);
 }

@@ -44,24 +44,24 @@ void RunAnimationDependingOnPgm() {
   case 10:
     Bubbles1();     
     break;
-    
+
   case 11:
     TripleMotion();     
     break;  
-    
-      case 12:
+
+  case 12:
     CrossNoise();     
     break; 
- 
-     case 13:
+
+  case 13:
     CrossNoise2();     
     break;    
 
-    case 14:
+  case 14:
     RandomAnimation();     
     break;    
-   
-  
+
+
   }
 }
 
@@ -78,6 +78,39 @@ void ReadButtons () {
 
     if (button1 == LOW) { // change (increment) mode
       mode ++;
+      if (mode == 7) mode = 0;
+      switch (mode) {
+
+      case 0:
+        pSmartMatrix->scrollText("PGM", -1);
+        break;
+
+      case 1:
+        pSmartMatrix->scrollText("SPEED", -1);
+        break;
+
+      case 2:
+        pSmartMatrix->scrollText("BRIGHT", -1);
+        break;
+
+      case 3:
+        pSmartMatrix->scrollText("RED", -1);
+        break;
+
+      case 4:
+        pSmartMatrix->scrollText("GREEN", -1);
+        break;
+
+      case 5:
+        pSmartMatrix->scrollText("BLUE", -1);
+        break;
+
+      case 6:
+        pSmartMatrix->scrollText("RESET", -1);
+        break;
+
+      }
+
       delay(DEBOUNCE_DELAY);
       // 0 pgm
       // 1 spd
@@ -86,7 +119,7 @@ void ReadButtons () {
       // 4 green
       // 5 blue
       // 6 reset
-      if (mode == 7) mode = 0;
+
     }
 
     if (mode == 0 && button2 == LOW) { // pgm up
@@ -141,14 +174,27 @@ void ReadButtons () {
       blue_level = blue_level - STEP_WIDTH;
       delay(DEBOUNCE_DELAY);
     }
-    if (mode == 6 && button2 == LOW) { // reset
+    if (mode == 6 && button2 == LOW) { // reset all
       BasicVariablesSetup();
       delay(DEBOUNCE_DELAY);
     }
-    if (mode == 6 && button3 == LOW) { // reset
-      BasicVariablesSetup();
+    if (mode == 6 && button3 == LOW) { // reset text
+      pSmartMatrix->scrollText(" ", -1);
       delay(DEBOUNCE_DELAY);
     }
   }
 }
+
+void SetupMatrixText() {
+  pSmartMatrix->setScrollMode(stopped);
+  pSmartMatrix->setScrollColor({
+    0xff, 0xff, 0xff  }
+  );
+  pSmartMatrix->setScrollSpeed(15);
+  pSmartMatrix->setScrollFont(font5x7);
+  //pSmartMatrix->scrollText("FunkyNoise", -1);
+  //pSmartMatrix->setScrollOffsetFromEdge(10);
+
+}
+
 

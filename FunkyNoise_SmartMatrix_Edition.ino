@@ -111,6 +111,8 @@ void setup() {
   pinMode(17, INPUT);
   pinMode(18, INPUT);
   pinMode(19, INPUT);
+  
+  SetupMatrixText();
 }
 
 
@@ -127,16 +129,16 @@ uint16_t beatsin(accum88 beats_per_minute, uint16_t lowest = 0, uint16_t highest
 }
 
 void loop() {
-  /*
+  
   ReadButtons();
   RunAnimationDependingOnPgm();
   ColorCorrection();
   ShowFrame();
-  */
+  
   
   // use that to see all
   // the number names the frames per animation
-  ShowAll(200);
+  //ShowAll(200);
 
   //use that the run a single animation
   //TripleMotion();
