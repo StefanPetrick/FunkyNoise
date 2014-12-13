@@ -1,5 +1,5 @@
 /*
-Some color palettes. 
+ Some color palettes. 
  Includes the predifined FastLED palettes and custom ones.
  
  -----------------------------------------------------------------
@@ -15,6 +15,7 @@ void PaletteRed() {
   CHSV( 0, 255, 0   ),
   CHSV( 0, 255, 255)); 
 }
+
 
 void PaletteCustom() {
   currentPalette = CRGBPalette16( 
@@ -40,6 +41,7 @@ void Pal() {
   //currentPalette = HeatColors_p;
 }
 
+
 void SetupRandomPalette() {
   currentPalette = CRGBPalette16( 
   CHSV( random8(), 255, 32 ), 
@@ -56,5 +58,81 @@ void Palette16() {
   0x000000, 0x0000FF, 0x0000FF, 0x000000,
   0x000000, 0xFF0000, 0xFF0000, 0x000000); 
 }
+
+
+void SetupRandomPalette2() {
+  currentPalette = CRGBPalette16( 
+  CHSV( random8(), 255, 0 ), 
+  CHSV( random8(), 255, 0), 
+  CHSV( random8(), 255, 0), 
+  CHSV( random8(), 255, 0),
+
+  CHSV( random8(), 255, random8() ), 
+  CHSV( random8(), random8(), 255), 
+  CHSV( random8(), 255, 255), 
+  CHSV( random8(), 255, 255),
+
+  CHSV( random8(), 255, 0 ), 
+  CHSV( random8(), 255, 255), 
+  CHSV( random8(), 255, 255), 
+  CHSV( random8(), random8(), 255),
+
+  CHSV( random8(), 255, 0 ), 
+  CHSV( random8(), 255, 0), 
+  CHSV( random8(), 255, 0), 
+  CHSV( random8(), 255, 0));
+}  
+
+
+void SetupRandomPalette3() {
+  currentPalette = CRGBPalette16( 
+  CHSV( random8(), 255, 0 ), 
+  CHSV( random8(), 255, 0), 
+  CHSV( random8(), 255, 255), 
+  CHSV( random8(), 255, 255),
+
+  CHSV( random8(), 255, 0 ), 
+  CHSV( random8(), 255, 255), 
+  CHSV( random8(), 255, 255), 
+  CHSV( random8(), 255, 0),
+
+  CHSV( random8(), 255, 0 ), 
+  CHSV( random8(), 255, 255), 
+  CHSV( random8(), 255, 255), 
+  CHSV( random8(), 255, 0),
+
+  CHSV( random8(), 255, 255 ), 
+  CHSV( random8(), 255, 255), 
+  CHSV( random8(), 255, 0), 
+  CHSV( random8(), 255, 0));
+}  
+
+
+void SetupRandomPalette4() {
+  currentPalette = CRGBPalette16( 
+  CHSV( random8(), 255, random8() ), 
+  CHSV( random8(), 255, random8()), 
+  CHSV( random8(), 255, 0), 
+  CHSV( random8(), 255, 255),
+
+  CHSV( random8(), 255, random8() ), 
+  CHSV( random8(), 255, 255), 
+  CHSV( random8(), 255, 255), 
+  CHSV( random8(), random8(), random8()),
+
+  CHSV( random8(), 255, random8() ), 
+  CHSV( random8(), 255, 255), 
+  CHSV( random8(), 255, 0), 
+  CHSV( random8(), 255, random8()),
+
+  CHSV( random8(), 255, 255 ), 
+  CHSV( random8(), 255, 0), 
+  CHSV( random8(), 255, 255),
+  CHSV( random8(), 255, random8()));
+}  
+
+
+
+
 
 

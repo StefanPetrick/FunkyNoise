@@ -38,6 +38,24 @@ void ShowLayer(byte layer, byte colorrepeat) {
 }
 
 
+// map a layer while ignoring the brightness information and replacing it by maximum
+
+void ShowLayerBright(byte layer, byte colorrepeat) { 
+  for(uint8_t i = 0; i < kMatrixWidth; i++) {
+    for(uint8_t j = 0; j < kMatrixHeight; j++) {
+
+      uint8_t color = noise[layer][i][j]; 
+
+      uint8_t   bri = 255;
+
+      // assign a color depending on the actual palette
+      CRGB pixel = ColorFromPalette( currentPalette, colorrepeat * (color + colorshift), bri );
+
+      leds[XY(i,j)] = pixel;
+    }
+  }
+}
+
 
 // Show 3 small 16x16 versions of the 3 noise planes
 // to keep track what is going on where when.
@@ -62,6 +80,7 @@ void Show3Layers() {
   }
 }
 
+// serial output parameters for debugging
 
 void ShowParameters(byte layer) {
   Serial.print("L");
@@ -79,7 +98,8 @@ void ShowParameters(byte layer) {
   Serial.print(" ");   
 }
 
-// output the noise value of noise[layer][0][0]
+// serial output the noise value of noise[layer][0][0] for debugging
+
 void SerialWriteNoiseValue(byte layer) {
   Serial.print("Layer");
   Serial.print(layer);
@@ -88,6 +108,8 @@ void SerialWriteNoiseValue(byte layer) {
   Serial.print("  ");
 }
 
+
+// serial output menu values for debugging
 
 void ShowMenuValues() {
   // serial print all relevant data
@@ -109,7 +131,9 @@ void ShowMenuValues() {
   Serial.println(LEDS.getFPS());
 }
 
+
 // under construction!
+
 void ShowNumberDistribution() {
   currentPalette = RainbowColors_p;
   x[0] += 1000;

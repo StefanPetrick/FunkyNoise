@@ -58,11 +58,12 @@ uint32_t z[NUM_LAYERS];
 uint32_t scale_x[NUM_LAYERS];
 uint32_t scale_y[NUM_LAYERS];
 
-int dx;
-int dy;
-int dz;
-int dsx;
-int dsy;
+// used for the random based animations
+int16_t dx;
+int16_t dy;
+int16_t dz;
+int16_t dsx;
+int16_t dsy;
 
 // a 3dimensional array used to store the calculated 
 // values of the different noise planes
@@ -103,15 +104,12 @@ void setup() {
   // fill all animation variables with valid values to
   // allow straight forward animation programming
   BasicVariablesSetup();
-  
-  ColorCorrection();
-  LEDS.setBrightness(brightness);
 
-  // the pins for the 3 buttons
+  // the pins for the 3 buttons of my custom interface
   pinMode(17, INPUT);
   pinMode(18, INPUT);
   pinMode(19, INPUT);
-  
+
   SetupMatrixText();
 }
 
@@ -129,22 +127,18 @@ uint16_t beatsin(accum88 beats_per_minute, uint16_t lowest = 0, uint16_t highest
 }
 
 void loop() {
-  
-  ReadButtons();
-  RunAnimationDependingOnPgm();
-  ColorCorrection();
-  ShowFrame();
-  
-  
-  // use that to see all
-  // the number names the frames per animation
-  //ShowAll(200);
 
-  //use that the run a single animation
-  //TripleMotion();
-  //NewAnimation();
-  //ShowFrame();
+  /*
+  Whats new?
+   Caleidoscope1-5 functions in experimental.ino 
+   Calceidoscope examples Caleido1-7 in Animations.ino
+   */
+
+  Caleido3();
+  ShowFrame();
+
 } 
+
 
 
 

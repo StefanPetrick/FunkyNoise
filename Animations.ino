@@ -10,6 +10,8 @@ A bunch of animations demonstrating how to creatively combine
  Water
  Bubbles1
  ShowPalette
+ 
+ (list is uncomplete)
  -----------------------------------------------------------------
  */
 
@@ -389,8 +391,8 @@ void Bubbles1() {
 }
 
 
-
 // layer2 movving arround a layer1 moving arround a layer0
+
 void TripleMotion() {
 
   currentPalette = RainbowColors_p;
@@ -422,12 +424,14 @@ void TripleMotion() {
   //Show3Layers();
 }
 
+
 // just shows the color gradient
 
 void ShowRedPalette() {
   PaletteRed();
   ShowPalette();
 }
+
 
 void CrossNoise() {
 
@@ -442,10 +446,9 @@ void CrossNoise() {
   scale_y[0] = 4000;
   FillNoise(0); 
   byte border = beatsin8(10, 20, 236);
-  
+
   CrossMapping(1, border);
 }
-
 
 
 void CrossNoise2() {
@@ -458,18 +461,19 @@ void CrossNoise2() {
   scale_x[0] = beatsin16(3,1000,10000);
   scale_y[0] = beatsin16(2,1000,10000);
   FillNoise(0);
-  
+
   byte border = beatsin8(8);
-  
+
   CrossMapping(1, border);
 }
 
 
 void RandomAnimation() {
-  
+
   noisesmoothing = 100;
-  
-  // danger: crappy code!
+
+  // danger: dirty + crappy code!
+  // use EVERY_N_MILLIS instead!
   byte ping=beatsin8(10); 
   if (ping < 1) {
     SetupRandomPalette();
@@ -479,13 +483,235 @@ void RandomAnimation() {
     scale_x[0] = random(8000) + 2000;
     scale_y[0] = random(8000) + 2000;
   }
-  
+
   y[0] += dy;
   x[0] += dx;
   z[0] += dz;
   FillNoise(0);
-  
-  
+
+
   ShowLayer(0, 2);
-  
 }
+
+
+
+void MilliTimer() {
+
+  currentPalette = RainbowStripeColors_p;
+
+  //EVERY_N_SECONDS(10) {colorshift += random8();}
+
+  //colorshift= beatsin88(12, 0,255, 0,0);
+
+  y[0] = millis()*spd;
+  x[0] = 2*beatsin88(spd*256);
+  scale_x[0] = 4000;
+  scale_y[0] = 4000;
+  y[1] = millis()*spd*2;
+  x[1] = 2*beatsin88(spd*256);
+  scale_x[1] = 4000;
+  scale_y[1] = 4000;
+  FillNoise(0);
+  FillNoise(1);
+  MergeMethod3(1);
+}
+
+
+void Caleido1() {
+
+  EVERY_N_SECONDS(4) {
+
+    SetupRandomPalette2();
+    dy = random16(4000) - 2000;
+    dx = random16(4000) - 2000;
+    dz = random16(4000) - 2000;
+    scale_x[0] = random16(10000) + 2000;
+    scale_y[0] = random16(10000) + 2000;
+  }
+
+  y[0] += dy;
+  x[0] += dx;
+  z[0] += dz;
+  FillNoise(0);
+
+  ShowLayer(0, 1);
+  Caleidoscope2();
+}
+
+
+void Caleido2() {
+
+  EVERY_N_SECONDS(4) {
+
+    SetupRandomPalette3();
+    dy = random16(4000) - 2000;
+    dx = random16(4000) - 2000;
+    dz = random16(4000) - 2000;
+    scale_x[0] = random16(10000) + 2000;
+    scale_y[0] = random16(10000) + 2000;
+  }
+
+  y[0] += dy;
+  x[0] += dx;
+  z[0] += dz;
+  FillNoise(0);
+
+  ShowLayer(0, 1);
+  Caleidoscope1();
+}
+
+
+// the "Electric Mandala"
+
+void Caleido3() {
+
+  // a new parameter set every 15 seconds
+  EVERY_N_SECONDS(15) {
+
+    SetupRandomPalette3();
+    dy = random16(500) - 250; // random16(2000) - 1000 is pretty fast but works fine, too
+    dx = random16(500) - 250;
+    dz = random16(500) - 250;
+    scale_x[0] = random16(10000) + 2000;
+    scale_y[0] = random16(10000) + 2000;
+  }
+
+  y[0] += dy;
+  x[0] += dx;
+  z[0] += dz;
+
+  FillNoise(0);
+  ShowLayer(0, 1);
+
+  Caleidoscope3();
+  Caleidoscope1();
+}
+
+
+void Caleido4() {
+
+  EVERY_N_SECONDS(45) {
+
+    SetupRandomPalette3();
+    /*
+    dy = random16(2000) - 1000; // random16(2000) - 1000 is pretty fast but works fine, too
+     dx = random16(2000) - 1000;
+     dz = random16(2000) - 1000;
+     */
+
+    dy = random16(500) - 250; 
+    dx = random16(500) - 250;
+    dz = random16(500) - 250;
+
+    scale_x[0] = random16(10000) + 2000;
+    scale_y[0] = random16(10000) + 2000;
+  }
+
+  y[0] += dy;
+  x[0] += dx;
+  z[0] += dz;
+
+  FillNoise(0);
+  ShowLayer(0, 1);
+
+  Caleidoscope4();
+  Caleidoscope2();
+}
+
+void Caleido5() {
+
+  // a new parameter set every 10 seconds
+  EVERY_N_SECONDS(10) {
+
+    SetupRandomPalette4();
+
+    dy = random16(1000) - 500; // random16(2000) - 1000 is pretty fast but works fine, too
+    dx = random16(1000) - 500;
+    dz = random16(500);
+
+
+    scale_x[0] = random16(7000) + 2000;
+    scale_y[0] = random16(7000) + 2000;
+  }
+
+  y[0] += dy;
+  x[0] += dx;
+  z[0] += dz;
+
+  EVERY_N_MILLIS(50) {
+    colorshift++; 
+  }
+
+  FillNoise(0);
+  ShowLayer(0, 1);
+
+  Caleidoscope5();
+  Caleidoscope4();
+  Caleidoscope2();
+}
+
+
+void Caleido6() {
+
+  // a new parameter set every 10 seconds
+  EVERY_N_SECONDS(10) {
+
+    SetupRandomPalette4();
+
+    dy = random16(1000) - 500; // random16(2000) - 1000 is pretty fast but works fine, too
+    dx = random16(1000) - 500;
+    dz = random16(500);
+
+
+    scale_x[0] = random16(7000) + 2000;
+    scale_y[0] = random16(7000) + 2000;
+  }
+
+  y[0] += dy;
+  x[0] += dx;
+  z[0] += dz;
+
+  EVERY_N_MILLIS(50) {
+    colorshift++; 
+  }
+
+  FillNoise(0);
+  ShowLayerBright(0, 1);
+
+  //Caleidoscope5();
+  Caleidoscope4();
+  Caleidoscope1();
+}
+
+
+void Caleido7() {
+
+  EVERY_N_SECONDS(10) {
+
+    SetupRandomPalette4();
+
+    dy = random16(1000) - 500; 
+    dx = random16(1000) - 500;
+    dz = random16(500);
+
+
+    scale_x[0] = random16(7000) + 2000;
+    scale_y[0] = random16(7000) + 2000;
+  }
+
+  y[0] += dy;
+  x[0] += dx;
+  z[0] += dz;
+
+  EVERY_N_MILLIS(50) {
+    colorshift++; 
+  }
+
+  FillNoise(0);
+  ShowLayerBright(0, 1);
+
+  Caleidoscope4();
+  Caleidoscope1();
+  FilterAll();
+}
+

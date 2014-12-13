@@ -16,6 +16,8 @@ Helpfull functions to keep the actual animation code short.
  ShowAll(uint16_t frames_per_animation)
  ColorCorrection
  
+ (uncomplete list)
+ 
  -----------------------------------------------------------------
  */
 
@@ -46,15 +48,11 @@ void FillNoise(byte layer) {
       uint32_t joffset = scale_y[layer] * (j-CentreY);
 
       byte data = inoise16(x[layer] + ioffset, y[layer] + joffset, z[layer]) >> 8;
-/*
-      // Marks data smoothing
-      data = qsub8(data,16);
-      data = qadd8(data,scale8(data,39));
 
       uint8_t olddata = noise[layer][i][j];
       uint8_t newdata = scale8( olddata, noisesmoothing ) + scale8( data, 256 - noisesmoothing );
       data = newdata;
-      */
+
 
       noise[layer][i][j] = data;
     }
@@ -65,14 +63,16 @@ void FillNoise(byte layer) {
 // Initialise the coordinates of the noise space with random
 // values for an altering starting point.
 // Set the zoom factor to a moderate level.
+// Fill the delta values with random stepwidths.
 
 void BasicVariablesSetup() {
 
   // set to reasonable values to avoid a black out
   colorshift = 0;
   noisesmoothing = 200;
-  
-  currentPalette = RainbowColors_p;
+
+  currentPalette = RainbowStripeColors_p;
+
 
   // just any free input pin
   random16_add_entropy(analogRead(18));
@@ -86,18 +86,26 @@ void BasicVariablesSetup() {
     scale_x[i] = 6000;
     scale_y[i] = 6000;
   }
+  // for the random movement
+  dx  = random8();
+  dy  = random8();
+  dz  = random8();
+  dsx = random8();
+  dsy = random8();
+
   // everything for the menu
   mode = 0;
-  spd = 127;
+  spd = 10;
   brightness = 255;
   red_level = 255;
   green_level = 255;
   blue_level = 255;
+
+  LEDS.setBrightness(brightness);
 }
 
 
 // Update leds and show fps
-// 216 fps when calling nothing else
 
 void ShowFrame() {
 
@@ -138,8 +146,6 @@ void MergeMethod1(byte colorrepeat) {
   for(uint8_t i = 0; i < kMatrixWidth; i++) {
     for(uint8_t j = 0; j < kMatrixHeight; j++) {
 
-      // map the noise values down to a byte range
-      // layer 0 and 2 interfere for the color
       uint8_t color = ( ( noise[0][i][j] )
         + ( noise[1][i][j] )
         + ( noise[2][i][j] ) )
@@ -211,14 +217,11 @@ void MergeMethod4(byte colorrepeat) {
   for(uint8_t i = 0; i < kMatrixWidth; i++) {
     for(uint8_t j = 0; j < kMatrixHeight; j++) {
 
-      // map the noise values down to a byte range
-      // layer 0 and 2 interfere for the color
       uint8_t color = ( ( noise[0][i][j] )
         + ( noise[1][i][j] )
         + ( noise[2][i][j] ) )
         / 3; 
 
-      // layer 2 gives the brightness  
       uint8_t   bri = (noise[0][i][j]);
 
       // assign a color depending on the actual palette
@@ -249,6 +252,8 @@ void ConstrainedMapping(byte layer, byte lower_limit, byte upper_limit, byte col
   }
 }
 
+
+// one possibility for a basic scripting / frame line composition
 
 void ShowAll(uint16_t count) {
   for(uint16_t i = 0; i < count; i++) {
@@ -311,14 +316,16 @@ void ShowAll(uint16_t count) {
     TripleMotion();
     ShowFrame();
   }
-  
-    for(uint16_t i = 0; i < count; i++) {
+
+  for(uint16_t i = 0; i < count; i++) {
     CrossNoise2();
     ShowFrame();
   }
-
-
 }
+
+
+// allows to dim colors down
+// works on the screenbuffer, after the image is computed
 
 void ColorCorrection() {
   for(uint16_t i = 0; i < NUM_LEDS; i++) {
@@ -328,14 +335,16 @@ void ColorCorrection() {
   }
 }
 
+
 // a constrained noise the fills the holes with a mirrored and recolored version of the same noise
+
 void CrossMapping(byte colorrepeat, byte limit) { 
   for(uint8_t i = 0; i < kMatrixWidth; i++) {
     for(uint8_t j = 0; j < kMatrixHeight; j++) {
 
       uint8_t color1 = noise[0][i][j];
       uint8_t color2 = noise[0][j][i];
-      
+
       CRGB pixel;
 
       if (color1 > limit) {
@@ -348,6 +357,18 @@ void CrossMapping(byte colorrepeat, byte limit) {
     }
   }
 }
+
+
+// a brightness mask based on layer 0 for the complete screenbuffer
+
+void FilterAll() {
+  for(uint8_t i = 0; i < kMatrixWidth; i++) {
+    for(uint8_t j = 0; j < kMatrixHeight; j++) {
+      leds[XY(i,j)] %= noise[0][i][j];
+    }
+  }
+}
+
 
 
 

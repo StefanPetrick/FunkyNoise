@@ -1,3 +1,7 @@
+// Some functions only used by my custom 3 button user interface.
+// You might never need it.
+
+
 void RunAnimationDependingOnPgm() {
   switch (pgm) {              
 
@@ -59,15 +63,33 @@ void RunAnimationDependingOnPgm() {
 
   case 14:
     RandomAnimation();     
-    break;    
+    break;  
 
+  case 15:
+    MilliTimer();     
+    break;   
 
+  case 16:
+    Caleido1();     
+    break;      
+
+  case 17:
+    Caleido2();     
+    break;     
+
+  case 18:
+    Caleido3();     
+    break;   
+
+  case 19:
+    Caleido5();     
+    break;      
   }
 }
 
 void ReadButtons () {
-  byte NUM_PGM = 14;
-  byte DEBOUNCE_DELAY = 100;
+  byte NUM_PGM = 19;
+  byte DEBOUNCE_DELAY = 200;
   byte STEP_WIDTH = 64;
   button1 = digitalRead(17);
   button2 = digitalRead(18);
@@ -82,31 +104,31 @@ void ReadButtons () {
       switch (mode) {
 
       case 0:
-        pSmartMatrix->scrollText("PGM", -1);
+        pSmartMatrix->scrollText("PROGAM + -", -1);
         break;
 
       case 1:
-        pSmartMatrix->scrollText("SPEED", -1);
+        pSmartMatrix->scrollText("SPEED + -", -1);
         break;
 
       case 2:
-        pSmartMatrix->scrollText("BRIGHT", -1);
+        pSmartMatrix->scrollText("BRIGHTNESS + -", -1);
         break;
 
       case 3:
-        pSmartMatrix->scrollText("RED", -1);
+        pSmartMatrix->scrollText("RED + -", -1);
         break;
 
       case 4:
-        pSmartMatrix->scrollText("GREEN", -1);
+        pSmartMatrix->scrollText("GREEN + -", -1);
         break;
 
       case 5:
-        pSmartMatrix->scrollText("BLUE", -1);
+        pSmartMatrix->scrollText("BLUE + -", -1);
         break;
 
       case 6:
-        pSmartMatrix->scrollText("RESET", -1);
+        pSmartMatrix->scrollText("+ FOR RESET  - FOR TEXT OFF", -1);
         break;
 
       }
@@ -133,11 +155,11 @@ void ReadButtons () {
       if (pgm == 255) pgm = NUM_PGM;
     }
     if (mode == 1 && button2 == LOW) { // spd up
-      spd++;
+      spd+=10;
       delay(DEBOUNCE_DELAY);
     }
     if (mode == 1 && button3 == LOW) { // spd down
-      spd--;
+      spd-=10;
       delay(DEBOUNCE_DELAY);
     }
     if (mode == 2 && button2 == LOW) { // bri up
@@ -186,15 +208,28 @@ void ReadButtons () {
 }
 
 void SetupMatrixText() {
-  pSmartMatrix->setScrollMode(stopped);
+  pSmartMatrix->setScrollMode(wrapForward);
+  //pSmartMatrix->setScrollMode(stopped);
   pSmartMatrix->setScrollColor({
-    0xff, 0xff, 0xff  }
+    0xff, 0xff, 0xff            }
   );
-  pSmartMatrix->setScrollSpeed(15);
+  pSmartMatrix->setScrollSpeed(35);
   pSmartMatrix->setScrollFont(font5x7);
   //pSmartMatrix->scrollText("FunkyNoise", -1);
   //pSmartMatrix->setScrollOffsetFromEdge(10);
-
 }
+
+
+void RunButtonMenu() {
+  ReadButtons();
+  RunAnimationDependingOnPgm();
+  ColorCorrection();
+  ShowFrame();
+}
+
+
+
+
+
 
 
